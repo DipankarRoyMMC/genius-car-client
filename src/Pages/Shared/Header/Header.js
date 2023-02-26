@@ -4,17 +4,24 @@ import logo from '../../../assets/logo.svg';
 import { AuthContext } from '../../../contexts/AuthProvider';
 
 const Header = () => {
-    const { user } = useContext(AuthContext);
+    const { user, logOut } = useContext(AuthContext);
+    const handleLogOut = () => {
+        logOut()
+            .then()
+            .catch(error => console.error(error))
+    }
+
     const menuItem = <>
         <ul className='list-none sm:flex-none md:flex sm:space-x-0 md:space-x-4 '>
-            <li className='font-semibold'><Link to='/'>Home</Link></li>
+            <Link to='/'><button className='btn btn-ghost'>Home</button></Link>
             {
                 user?.email ?
                     <>
-                        <li className='font-semibold'><Link to='/orders'>Orders</Link></li>
+                        <Link to='/orders'><button className='btn btn-ghost'>Orders</button></Link>
+                        <Link to='/'><button onClick={handleLogOut} className='btn btn-ghost'>Log Out</button></Link>
                     </>
                     :
-                    <li className='font-semibold'><Link to='/login'>Login</Link></li>
+                    <Link to='/login'><button className='btn btn-ghost'>Log In</button></Link>
 
             }
         </ul>
@@ -31,9 +38,10 @@ const Header = () => {
                         {menuItem}
                     </ul>
                 </div>
-                <a href="#" className="btn btn-ghost normal-case text-xl">
+                <Link className="btn btn-ghost normal-case text-xl" to='/'>
                     <img className='h-15' src={logo} alt="" />
-                </a>
+                </Link>
+
             </div>
             <div className="navbar-center hidden lg:flex">
                 {menuItem}

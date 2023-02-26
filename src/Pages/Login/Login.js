@@ -1,11 +1,16 @@
+import { current } from 'daisyui/src/colors';
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../../assets/images/login/login.svg';
 import { AuthContext } from '../../contexts/AuthProvider';
 
 
 const Login = () => {
     const { login } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const from = location.state?.from?.pathname || '/';
 
     const handleLogin = (event) => {
         event.preventDefault();
@@ -16,11 +21,30 @@ const Login = () => {
         login(email, password)
             .then(result => {
                 const user = result.user;
-                console.log(user);
-            })
-            .then(error => console.log(error))
+                const currentUser = {
+                    email: user.email
+                }
+                console.log(currentUser);
 
-        // console.log('submit for login')
+                fetch('http://localhost:5000/jwt', {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify(currentUser)
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data)
+                        // add easiy place token on local storage and but not save 
+                        localStorage.setItem('genius-token', data.token);
+                        navigate(from, { replace: true })
+                    })
+
+                form.reset();
+            })
+            .catch(error => console.log(error))
+
     }
 
     return (
@@ -36,13 +60,13 @@ const Login = () => {
                             <label className="label">
                                 <span className="label-text">Email</span>
                             </label>
-                            <input name="email" type="text" placeholder="Enter Your Email" className="input input-bordered" />
+                            <input name="email" type="email" placeholder="Enter Your Email" className="input input-bordered" />
                         </div>
                         <div className="form-control">
                             <label className="label">
                                 <span className="label-text">Password</span>
                             </label>
-                            <input name="password" type="text" placeholder="Enter your password" className="input input-bordered" />
+                            <input name="password" type="password" placeholder="Enter your password" className="input input-bordered" />
                             <label className="label">
                                 <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
                             </label>
